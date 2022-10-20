@@ -1,30 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Vue.js Starting to Learn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
     <div id="vueinstance" class="wrapper">
-        <h1>{{ header.toLocaleUpperCase('en-US') }}</h1>
-        <div class="add-item-form d-flex">
-            <input type="text" v-model="newItem" placeholder="Add an Item" v-on:keyup.enter="items.push(newItem)" required>
-            <button type="button" v-on:click="items.push(newItem)" class="btn btn-primary w-25 h-25 align-self-center mx-3">Add Item</button>
+        <div class="header d-flex justify-content-between">
+            <h1>{{ header.toLocaleUpperCase('en-US') }}</h1>
+            <!-- @ and v-on: same -->
+            <button v-if="state === 'default'" class="btn btn-primary w-25 h-25 align-self-center mx-3" @click="changeState('show')">Add Item</button>
+            <button v-else class="btn btn-danger h-25 mx-3" @click="changeState('default')">Cancel</button>
+        </div>
+        <div v-if="state === 'show'" class="add-item-form d-flex">
+            <input type="text" v-model="newItem" placeholder="Add an Item" @keyup.enter="addItem" pattern="[A-Za-z0-9]+" onkeydown="if(['Space'].includes(arguments[0].code)){return false;}">
+            <!-- v-bind:disabled or :disabled can be use-->
+            <button @click="addItem" v-bind:disabled ="newItem.length === 0" class="btn btn-primary w-25 h-25 align-self-center mx-3">Add Item</button>
         </div>
         <ul>
-            <li v-for="item in items">{{ item }}</li>
+            <li v-for="item in reversedItems">{{ item }}</li>
         </ul>
+        <p v-if="items.length === 0" class="fs-5">There is no items in the list !</p>
     </div>
     <script>
         var shoppingList = new Vue({
             el: '#vueinstance',
             data: {
+                state: 'default',
                 header: 'Shopping list app',
                 newItem: '',
                 items: [
@@ -32,9 +45,25 @@
                     '10 blue shirt',
                     '5 game board',
                 ]
+            },
+            computed: {
+                reversedItems () {
+                    return this.items.slice(0).reverse();
+                }
+            },
+            methods: {
+                addItem: function () {
+                    this.items.push(this.newItem);
+                    this.newItem = '';
+                },
+                changeState: function (newState) {
+                    this.state = newState;
+                    this.newItem = '';
+                }
             }
         });
     </script>
-    
+
 </body>
+
 </html>
